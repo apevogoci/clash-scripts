@@ -10,7 +10,7 @@ BEGIN {
 }
 
 dmn == 0 {
-	if (/^domains/) {
+	if (/^[[:space:]]*domains = \{/) {
 		dmn = 1
 		print "payload:"
 	}
@@ -22,21 +22,20 @@ dmn == 1 && /;/ {
 	next
 }
 
-dmn == 1 {
-	if (/^[[:space:]]*"/) {
-		split($0, t, /"/)
-		tld = t[2]
-		delete t
-		next
-	}
-	if (/^[[:space:]]*[[:digit:]]/) {
-		split($0, t, /[:"[:space:]]+/)
-		for (i = 1; i < length(t[3]) + 1; i += t[2]) {
-			print "  - DOMAIN-SUFFIX," substr(t[3], i, t[2]) "." tld
-		}
-		delete t
-		next
-	}
+dmn == 1 && /^[[:space:]]*[0-9]+:/ {
+	split($0, t, /"/)
+	c = int(t[1])
+	gsub(".{" c "}", "  - DOMAIN-SUFFIX,&." tld "\n", t[2])
+	printf t[2]
+	delete t
+	next
+}
+
+dmn == 1 && /^[[:space:]]*"/ {
+	split($0, t, /"/)
+	tld = t[2]
+	delete t
+	next
 }
 
 ips == 0 {
@@ -53,8 +52,8 @@ ips == 1 && /"/ {
 }
 
 ips == 1 {
-	split($0, t, /[^0-9a-z]+/)
-	for (i = 1; i <= length(t); ++i) {
+	l = split($0, t, /[^0-9a-z]+/)
+	for (i = 1; i <= l; ++i) {
 		#print i, t[i]
 		if (length(t[i]) > 0) {
 			cip = pip
@@ -95,8 +94,8 @@ spc == 1 && /;/ {
 }
 
 spc == 1 {
-	split($0, t, /\] *, *\[/)
-	for (j = 1; j <= length(t); ++j) {
+	l = split($0, t, /\] *, *\[/)
+	for (j = 1; j <= l; ++j) {
 		gsub(/[^0-9.,]+/, "", t[j])
 		sub(/,/, "/", t[j])
 		print("  - '" t[j] "'") >> SPCF
