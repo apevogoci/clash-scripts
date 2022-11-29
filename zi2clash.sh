@@ -21,6 +21,7 @@ HERE="$(dirname "$(readlink -f "${0}")")"
 cd "${HERE}"
 
 if [ ! -d "${CDIR}" ]
+then
 	rm -rf "${CDIR}" 2>/dev/null
 	mkdir "${CDIR}"
 fi
