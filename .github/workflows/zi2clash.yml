@@ -15,7 +15,7 @@ jobs:
   build:
     env:
       SUCC: 0
-      CLASHCONF_TOKEN: ${{ secrets.CLASHCONF }}
+      CLASHCONF_TOKEN: ${{ secrets.CLASH_CONF }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout clash-scripts
@@ -46,5 +46,5 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           repository: apevogoci/clash-conf
-          github_token: ${{ env.CLASHCONF_TOKEN }}
+          github_token: ${{ secrets.CLASH_CONF }}
           force: false
