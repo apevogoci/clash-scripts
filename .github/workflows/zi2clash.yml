@@ -23,6 +23,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           repository: apevogoci/clash-conf
+          path: clash-conf
       - name: Run zi2clash
         run: |
           ls -AFR
