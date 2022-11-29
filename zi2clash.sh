@@ -14,7 +14,6 @@ TNXD="$(mktemp -qp "$TDIR")"
 THLS="$(mktemp -qp "$TDIR")"
 # Temp file exclude hosts
 TEXH="$(mktemp -qp "$TDIR")"
-CDIR="clash-conf/conf"
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "${HERE}"
