@@ -22,7 +22,7 @@ jobs:
       - name: Checkout clash-conf
         uses: actions/checkout@v3
         with:
-          repository: clash-conf
+          repository: apevogoci/clash-conf
       - name: Run zi2clash
         run: |
           echo $SUCC
@@ -38,6 +38,6 @@ jobs:
         if: ${{ env.SUCC == 0 }}
         uses: ad-m/github-push-action@master
         with:
-          repository: clash-conf
+          repository: apevogoci/clash-conf
           github_token: ${{ secrets.CLASH-CONF-PUSH }}
           force: true
