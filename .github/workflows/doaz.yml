@@ -1,0 +1,34 @@
+name: Do antizapret original script
+on:
+  workflow_dispatch:
+
+    jobs:
+      BuildUnsigned:
+        runs-on: ubuntu-latest
+    steps:
+      - name: Cache
+        uses: actions/cache@v3
+        with:
+          key: azgitrepo
+          path: ./antizapret-pac-generator-light
+      - name: Checkout Repository
+        run: |
+          if [ -e ./antizapret-pac-generator-light/parse.sh ]
+          then
+          cd ./antizapret-pac-generator-light
+          git pull origin
+          else
+          git clone https://bitbucket.org/anticensority/antizapret-pac-generator-light.git
+          cd ./antizapret-pac-generator-light
+          fi
+          sudo apt install idn sipcalc zstd
+          ./doall.sh
+          ./generate-pac.sh
+          tar c {temp,result} | tar xC ../
+          rm {temp,result}/*
+          zstd -1 --rm ../{temp,result}/*
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app
+          path: ./

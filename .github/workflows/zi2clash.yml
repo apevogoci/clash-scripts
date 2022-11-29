@@ -1,4 +1,4 @@
-name: Run az2clash
+name: Run zi2clash
 on:
   schedule:
     - cron: '30 * * * *'
@@ -17,23 +17,27 @@ jobs:
       SUCC: 0
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Download antizapret pac file
+      - name: Checkout clash-scripts
+        uses: actions/checkout@v3
+      - name: Checkout clash-conf
+        uses: actions/checkout@v3
+        with:
+          repository: clash-conf
+      - name: Run zi2clash
         run: |
           echo $SUCC
-          mkdir -p conf
-          curl -L --compressed -o 'proxy.pac' 'https://antizapret.prostovpn.org/proxy.pac' || echo "SUCC=1" >> $GITHUB_ENV
-          awk -f ./scripts/antizapret2clash.awk ./proxy.pac | sort -bk2 -o ./conf/rules_azd.yaml
-          rm ./proxy.pac
-      - name: Commit files # transfer the new html files back into the repository
+          sudo apt install zstd idn2
+          ./zi2clash.sh
+      - name: Commit changes
         if: ${{ env.SUCC == 0 }}
         run: |
           git config --local user.name "ghactions"
           git add ./conf
           git commit -m "Updating rules" || echo "SUCC=1" >> $GITHUB_ENV
-      - name: Push changes # push the output folder to your repo
+      - name: Push changes
         if: ${{ env.SUCC == 0 }}
         uses: ad-m/github-push-action@master
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repository: clash-conf
+          github_token: ${{ secrets.CLASH-CONF-PUSH }}
           force: true

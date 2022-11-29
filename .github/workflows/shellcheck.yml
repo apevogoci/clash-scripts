@@ -1,0 +1,23 @@
+name: Shellcheck
+on:
+  workflow_dispatch:
+
+permissions: write-all
+
+defaults:
+  run:
+    shell: bash
+    working-directory: ./
+
+jobs:
+  build:
+    env:
+      SUCC: 0
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Shellcheck
+        run: |
+          echo $SUCC
+          sudo apt install shellcheck
+          shellcheck -o all -s sh ./az2clash.sh
