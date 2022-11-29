@@ -3,10 +3,11 @@ on:
   schedule:
     - cron: '0 0/12 * * *'
   workflow_dispatch:
-
-    jobs:
-      del_runs:
-        runs-on: ubuntu-latest
+  
+  
+jobs:
+  del_runs:
+    runs-on: ubuntu-latest
     steps:
       - name: Delete workflow runs
         uses: Mattraks/delete-workflow-runs@v2
