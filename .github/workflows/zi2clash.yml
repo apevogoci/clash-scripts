@@ -26,6 +26,7 @@ jobs:
         with:
           repository: apevogoci/clash-conf
           path: clash-conf
+          persist-credentials: false
       - name: Run zi2clash
         run: |
           echo $SUCC
