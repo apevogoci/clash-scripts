@@ -1,7 +1,7 @@
 name: Run az2clash
 on:
-  schedule:
-    - cron: '30 * * * *'
+  #schedule:
+  #  - cron: '30 * * * *'
   workflow_dispatch:
 
 permissions: write-all
