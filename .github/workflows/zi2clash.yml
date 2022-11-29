@@ -15,7 +15,6 @@ jobs:
   build:
     env:
       SUCC: 0
-      CLASHCONF_TOKEN: ${{ secrets.CLASH_CONF }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout clash-scripts
@@ -30,7 +29,6 @@ jobs:
       - name: Run zi2clash
         run: |
           echo $SUCC
-          echo $CLASHCONF_TOKEN | sed -re 's/./_&/g'
           sudo apt install zstd idn2
           export CDIR="$(readlink -f "./clash-conf/conf")"
           ./clash-scripts/zi2clash.sh
@@ -47,4 +45,5 @@ jobs:
         with:
           repository: apevogoci/clash-conf
           github_token: ${{ secrets.CLASH_CONF }}
+          directory: clash-conf
           force: false
