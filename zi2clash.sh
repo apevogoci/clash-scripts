@@ -20,6 +20,11 @@ export TIDN="$(mktemp -qp "$TDIR")"
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "${HERE}"
 
+if [ ! -d "${CDIR}" ]
+	rm -rf "${CDIR} 2>/dev/null
+	mkdir "${CDIR}"
+fi
+
 LISTLINK='https://raw.githubusercontent.com/zapret-info/z-i/master/dump.csv'
 wget -q -S --header 'Accept-Encoding: gzip' -O "${TLST}" -o "${TRSP}" "${LISTLINK}" || exit 1
 LISTSIZE="$(grep -i '^ *content-length:' "${TRSP}" | sed -re 's/[^0-9]//g')"
