@@ -15,6 +15,7 @@ BEGIN {
 	TIDN = ENVIRON["TIDN"]
 	TEXH = ENVIRON["TEXH"]
 	CDIR = ENVIRON["CDIR"]
+	for(x in ENVIRON)print x,ENVIRON[x]
 }
 
 {
