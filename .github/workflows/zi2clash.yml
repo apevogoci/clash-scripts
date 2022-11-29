@@ -42,20 +42,18 @@ jobs:
           git commit -m "Updating rules" || echo "SUCC=1" >> $GITHUB_ENV
       - name: Push changes
         if: ${{ env.SUCC == 0 }}
-        uses: cpina/github-action-push-to-another-repository@main
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.CLASH_CONF }}
+        uses: ad-m/github-push-action@master
         with:
-          source-directory: 'clash-conf'
-          destination-github-username: 'apevogoci'
-          destination-repository-name: 'clash-conf'
-          user-email: opouhive@duck.com
-          target-branch: main 
-     
-        
-#        uses: ad-m/github-push-action@master
+          repository: apevogoci/clash-conf
+          github_token: ${{ secrets.CLASH_CONF }}
+          directory: clash-conf
+          force: false
+#        uses: cpina/github-action-push-to-another-repository@main
+#        env:
+#          API_TOKEN_GITHUB: ${{ secrets.CLASH_CONF }}
 #        with:
-#          repository: apevogoci/clash-conf
-#          github_token: ${{ secrets.CLASH_CONF }}
-#          directory: clash-conf
-#          force: false
+#          source-directory: 'clash-conf'
+#          destination-github-username: 'apevogoci'
+#          destination-repository-name: 'clash-conf'
+#          user-email: opouhive@duck.com
+#          target-branch: main
