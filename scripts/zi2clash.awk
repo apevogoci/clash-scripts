@@ -12,7 +12,7 @@ BEGIN {
 		EBIP[ip2int($0)] = 1
 	}
 	close("config/exclude-hosts-by-ips-dist.txt")
-	TDIR = ENVIRON["TDIR"]
+	TIDN = ENVIRON["TIDN"]
 	TEXH = ENVIRON["TEXH"]
 	CDIR = ENVIRON["CDIR"]
 }
@@ -60,7 +60,7 @@ $2 ~ /(^$|\\)/ {
 #}
 /[^a-zA-Z0-9~_.-]/ {
 	#IDN[$0] = 1
-	print | ("zstd -3 >'" TDIR "/idn.txt'")
+	print | ("zstd -3 >'" TIDN "'")
 	next
 }
 
@@ -70,11 +70,11 @@ $2 ~ /(^$|\\)/ {
 
 END {
 	#close(TEXH)
-	close("zstd -3 >'" TDIR "/idn.txt'")
-	while ((("zstdcat '" TDIR "/idn.txt' | idn2") | getline) > 0) {
+	close("zstd -3 >'" TIDN "'")
+	while ((("zstdcat '" TIDN "' | idn2") | getline) > 0) {
 		DMN[$0] = 1
 	}
-	close("zstdcat '" TDIR "/idn.txt' | idn2")
+	close("zstdcat '" TIDN "' | idn2")
 	readf("config/exclude-hosts-dist.txt", EXH)
 	readf("config/exclude-hosts-custom.txt", EXH)
 	for (d in EXH) {

@@ -14,6 +14,8 @@ TNXD="$(mktemp -qp "$TDIR")"
 THLS="$(mktemp -qp "$TDIR")"
 # Temp file exclude hosts
 TEXH="$(mktemp -qp "$TDIR")"
+# Temp file idn
+TIDN="$(mktemp -qp "$TDIR")"
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "${HERE}"
