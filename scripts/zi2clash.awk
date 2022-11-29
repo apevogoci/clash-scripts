@@ -13,6 +13,7 @@ BEGIN {
 	}
 	close("config/exclude-hosts-by-ips-dist.txt")
 	TDIR = ENVIRON["TDIR"]
+	TEXH = ENVIRON["TEXH"]
 	CDIR = ENVIRON["CDIR"]
 }
 
@@ -55,7 +56,7 @@ $2 ~ /(^$|\\)/ {
 }
 
 #$1 ~ /(^|[^0-9])(81\.91\.178\.252|37\.48\.77\.229|178\.208\.90\.38|213\.13\.30\.100|52\.169\.125\.34|81\.91\.178\.242|5\.61\.58\.119|45\.81\.227\.72|209\.99\.40\.222|95\.211\.189\.202|34\.252\.217\.230|103\.224\.212\.222)($|[^0-9])/ {
-#	print($2) >> TDIR "/exclude-hosts.txt"
+#	print($2) >> TEXH
 #}
 /[^a-zA-Z0-9~_.-]/ {
 	#IDN[$0] = 1
@@ -68,7 +69,7 @@ $2 ~ /(^$|\\)/ {
 }
 
 END {
-	#close(TDIR "/exclude-hosts.txt")
+	#close(TEXH)
 	close("zstd -3 >'" TDIR "/idn.txt'")
 	while ((("zstdcat '" TDIR "/idn.txt' | idn2") | getline) > 0) {
 		DMN[$0] = 1
@@ -77,7 +78,7 @@ END {
 	readf("config/exclude-hosts-dist.txt", EXH)
 	readf("config/exclude-hosts-custom.txt", EXH)
 	for (d in EXH) {
-		print(d) > (TDIR "/exclude-hosts.txt")
+		print(d) > (TEXH)
 	}
 	readf("config/include-hosts-dist.txt", DMN)
 	readf("config/include-hosts-custom.txt", DMN)
