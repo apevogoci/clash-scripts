@@ -44,5 +44,5 @@ jobs:
         uses: ad-m/github-push-action@master
         with:
           repository: apevogoci/clash-conf
-          github_token: ${{ secrets.CLASH-CONF-PUSH }}
+          github_token: ${{ secrets.CLASH_CONF }}
           force: false
