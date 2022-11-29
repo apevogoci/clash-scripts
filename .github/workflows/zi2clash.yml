@@ -19,20 +19,22 @@ jobs:
     steps:
       - name: Checkout clash-scripts
         uses: actions/checkout@v3
+        with:
+          path: clash-scripts
       - name: Checkout clash-conf
         uses: actions/checkout@v3
         with:
           repository: apevogoci/clash-conf
-          path: ../clash-conf
+          path: clash-conf
       - name: Run zi2clash
         run: |
           echo $SUCC
           sudo apt install zstd idn2
-          ./zi2clash.sh
+          ./clash-scripts/zi2clash.sh
       - name: Commit changes
         if: ${{ env.SUCC == 0 }}
         run: |
-          cd ../clash-conf
+          cd clash-conf
           git config --local user.name "ghactions"
           git add ./conf
           git commit -m "Updating rules" || echo "SUCC=1" >> $GITHUB_ENV
