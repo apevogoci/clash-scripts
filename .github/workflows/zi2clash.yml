@@ -42,7 +42,9 @@ jobs:
       - name: Push changes
         if: ${{ env.SUCC == 0 }}
         uses: ad-m/github-push-action@master
+        env:
+          CLASHCONF_TOKEN: ${{ secrets.CLASHCONF }}
         with:
           repository: apevogoci/clash-conf
-          github_token: ${{ secrets.CLASHCONF }}
+          github_token: $CLASHCONF_TOKEN
           force: false
