@@ -25,6 +25,7 @@ jobs:
           repository: apevogoci/clash-conf
       - name: Run zi2clash
         run: |
+          ls -AFR
           echo $SUCC
           sudo apt install zstd idn2
           ./zi2clash.sh
