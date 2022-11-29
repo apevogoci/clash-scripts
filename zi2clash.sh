@@ -5,7 +5,7 @@ RETD="$(readlink -f ".")"
 MYTMPDIR="$(mktemp -d)"
 trap 'rm -rf -- "$MYTMPDIR";cd "$RETD";exit' EXIT INT TERM
 TDIR="$(mktemp -qp "$MYTMPDIR")"
-CDIR="./conf"
+CDIR="clash-conf/conf"
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 cd "${HERE}"
