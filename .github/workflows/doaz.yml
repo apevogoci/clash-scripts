@@ -1,5 +1,6 @@
 name: Do antizapret original script
-on: workflow_dispatch
+on:
+  workflow_dispatch:
 
 jobs:
   BuildUnsigned:
