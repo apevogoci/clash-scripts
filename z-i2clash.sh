@@ -6,6 +6,7 @@ TDIR="$(mktemp -d)"
 trap 'rm -rf -- "$MYTMPDIR";cd "$RETD";exit' EXIT INT TERM
 # Temp file downloaded list.csv
 TLST="$(mktemp -qp "$TDIR")"
+#TLST="list.csv.gz"
 # Temp file rssponse web server
 TRSP="$(mktemp -qp "$TDIR")"
 # Temp file downloaded nxdomains.txt
@@ -38,7 +39,7 @@ LISTSIZE="$(grep -i '^ *content-length:' "${TRSP}" | sed -re 's/[^0-9]//g')"
 
 zstdcat "${TLST}" |
 	iconv -f cp1251 -t utf-8 |
-	awk -f "scripts/zi2clash.awk" |
+	awk -f "scripts/zapret-info2clash.awk" |
 	awk -f "scripts/getzones.awk" |
 	zstd -3 >"${THLS}"
 
