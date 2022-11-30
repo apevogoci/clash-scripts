@@ -32,7 +32,7 @@ jobs:
           echo $SUCC
           sudo apt install zstd idn2
           export CDIR="$(readlink -f "./clash-conf/conf")"
-          ./clash-scripts/zi2clash.sh
+          ./clash-scripts/z-i2clash.sh
       - name: Commit changes
         if: ${{ env.SUCC == 0 }}
         run: |
