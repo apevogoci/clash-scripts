@@ -13,6 +13,7 @@ BEGIN {
 	}
 	close("config/exclude-hosts-by-ips-dist.txt")
 	TIDN = ENVIRON["TIDN"]
+	tidnP = "zstd -3 >'" TIDN "'"
 	TEXH = ENVIRON["TEXH"]
 	CDIR = ENVIRON["CDIR"]
 }
@@ -50,7 +51,7 @@ $2 ~ /(^$|\\)/ {
 }
 
 /[^a-zA-Z0-9~_.-]/ {
-	print | ("zstd -3 >'" TIDN "'")
+	print | tidnP
 	next
 }
 
@@ -59,7 +60,7 @@ $2 ~ /(^$|\\)/ {
 }
 
 END {
-	close("zstd -3 >'" TIDN "'")
+	close(tidnP)
 	while ((("zstdcat '" TIDN "' | idn2") | getline) > 0) {
 		DMN[$0] = 1
 	}
@@ -68,7 +69,6 @@ END {
 	readf("config/exclude-hosts-custom.txt", EXH)
 	for (d in EXH) {
 		print(d) > (TEXH)
-		print(d) > "exclhos.txt"
 	}
 	readf("config/include-hosts-dist.txt", DMN)
 	readf("config/include-hosts-custom.txt", DMN)
@@ -88,6 +88,7 @@ END {
 	close(CDIR "/rules_azi.yaml")
 	readf_ip("config/include-ips-dist.txt", BIP)
 	readf_ip("config/include-ips-custom.txt", BIP)
+	aziP = "sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azi.yaml'"
 	for (i in BIP) {
 		p = 1
 		for (j in SIP) {
@@ -100,20 +101,21 @@ END {
 		#	print(BIP[i]) > TDIR "/iplist_blockedbyip_noid2971_collapsed.txt"
 		#}
 		if (p && i !~ EIP) {
-			print(BIP[i] "/32") | ("sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azi.yaml'")
+			print(BIP[i] "/32") | aziP
 		}
 	}
 	#close(TDIR "/iplist_blockedbyip_noid2971_collapsed.txt")
-	close("sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azi.yaml'")
+	close(aziP)
 	delete BIP
 	#delete EIP
 	print("payload:") > (CDIR "/rules_azs.yaml")
 	close(CDIR "/rules_azs.yaml")
+	azsP = "sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azs.yaml'"
 	for (i in SIP) {
 		#printf("%x\t%x\n", i, SIP[i][1]) > "SIP"
-		print(SIP[i][2]) | ("sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azs.yaml'")
+		print(SIP[i][2]) | azsP
 	}
-	close("sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azs.yaml'")
+	close(azsP)
 	delete SIP
 }
 
@@ -127,7 +129,7 @@ function ip2int(ip, arr)
 function readf(F, A, l)
 {
 	while ((getline l < F) > 0) {
-		if (length(l) > 0 && l !~ /^#/) {
+		if ((l !~ /^(#|[[:space:]]*$)/)) {
 			A[l] = 1
 		}
 	}
