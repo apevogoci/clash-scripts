@@ -1,12 +1,12 @@
 BEGIN {
 	FS = ";"
-	IPRE = "((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\\.){3}(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])"
+	IP1 = "(1?[0-9]{1,2}|2([0-4][0-9]|5[0-5]))"
+	IPRE = "(" IP1 "\\.){3}" IP1
+	IPREWS = "^" IPRE "($|[^0-9])"
 	SIPC = split("", SIP, "")
 	BIPC = split("", BIP, "")
 	DMNC = split("", DMN, "")
 	EXHC = split("", EXH, "")
-	#EBIP="$(sed -re ':a;$!{N;ba};s/;\n\^/|/g;s/^\^/&(^|[^0-9])(/;s/;$/)($|[^0-9])/;s/\\\./\\&/g' "config/exclude-hosts-by-ips-dist.txt")"
-	#EBIP = "(^|[^0-9])(81\\.91\\.178\\.252|37\\.48\\.77\\.229|178\\.208\\.90\\.38|213\\.13\\.30\\.100|52\\.169\\.125\\.34|81\\.91\\.178\\.242|5\\.61\\.58\\.119|45\\.81\\.227\\.72|209\\.99\\.40\\.222|95\\.211\\.189\\.202|34\\.252\\.217\\.230|103\\.224\\.212\\.222)($|[^0-9])"
 	while ((getline < "config/exclude-hosts-by-ips-dist.txt") > 0) {
 		gsub(/[^0-9.]/, "", $0)
 		EBIP[ip2int($0)] = 1
@@ -18,26 +18,20 @@ BEGIN {
 }
 
 {
-	#IBRE = $0 !~ /33(-4\/2018|\320\260-5536\/2019)/ && (($2 == "" && $3 == "") || $1 == $2)
 	split($1, IPAR, "|")
 	for (x in IPAR) {
-		if (IPAR[x] ~ ("^" IPRE "($|[^0-9])")) {
-			if (IPAR[x] ~ /\//) {
-				#print(i[x]) >> "result/iplist_special_range.txt"
-				m = split(IPAR[x], CIP, "/")
-				t = ip2int(CIP[1])
-				SIP[t][1] = t - 1 + 2 ^ (32 - int(CIP[2]))
-				SIP[t][2] = IPAR[x]
-				delete CIP
+		if (IPAR[x] ~ IPREWS) {
+			if (d = index(IPAR[x], "/")) {
+				i = ip2int(substr(IPAR[x], 1, d - 1))
+				SIP[i][1] = i - 1 + 2 ^ (32 - int(substr(IPAR[x], d + 1)))
+				SIP[i][2] = IPAR[x]
 			} else {
-				t = ip2int(IPAR[x])
-				if (EBIP[t]) {
+				i = ip2int(IPAR[x])
+				if (length($2) > 0 && i in EBIP) {
 					EXH[$2] = 1
 				}
-				#if (IBRE) {
-				if ((($2 == "" && $3 == "") || $1 == $2) && $0 !~ /33(-4\/2018|\320\260-5536\/2019)/) {
-					#print(IPAR[x]) > TDIR "/iplist_blockedbyip_noid2971.txt"
-					BIP[t] = IPAR[x]
+				if ((($2 == "" && $3 == "") || $1 == $2) && $5 !~ /33(-4\/2018|\320\260-5536\/2019)/) {
+					BIP[i] = IPAR[x]
 				}
 			}
 		}
@@ -55,11 +49,7 @@ $2 ~ /(^$|\\)/ {
 	gsub(/[.,]$/, "", $0)
 }
 
-#$1 ~ /(^|[^0-9])(81\.91\.178\.252|37\.48\.77\.229|178\.208\.90\.38|213\.13\.30\.100|52\.169\.125\.34|81\.91\.178\.242|5\.61\.58\.119|45\.81\.227\.72|209\.99\.40\.222|95\.211\.189\.202|34\.252\.217\.230|103\.224\.212\.222)($|[^0-9])/ {
-#	print($2) >> TEXH
-#}
 /[^a-zA-Z0-9~_.-]/ {
-	#IDN[$0] = 1
 	print | ("zstd -3 >'" TIDN "'")
 	next
 }
@@ -69,7 +59,6 @@ $2 ~ /(^$|\\)/ {
 }
 
 END {
-	#close(TEXH)
 	close("zstd -3 >'" TIDN "'")
 	while ((("zstdcat '" TIDN "' | idn2") | getline) > 0) {
 		DMN[$0] = 1
@@ -79,6 +68,7 @@ END {
 	readf("config/exclude-hosts-custom.txt", EXH)
 	for (d in EXH) {
 		print(d) > (TEXH)
+		print(d) > "exclhos.txt"
 	}
 	readf("config/include-hosts-dist.txt", DMN)
 	readf("config/include-hosts-custom.txt", DMN)
@@ -89,9 +79,11 @@ END {
 	}
 	delete DMN
 	delete EXH
-	EIPC = split("", EIP, "")
-	readf_ip("config/exclude-ips-dist.txt", EIP)
-	readf_ip("config/exclude-ips-custom.txt", EIP)
+	#EIPC = split("", EIP, "")
+	#readf_ip("config/exclude-ips-dist.txt", EIP)
+	#readf_ip("config/exclude-ips-custom.txt", EIP)
+	EIP = "^(" readf_re("config/exclude-ips-dist.txt") readf_re("config/exclude-ips-custom.txt")
+	sub(/\|$/, ")", EIP)
 	print("payload:") > (CDIR "/rules_azi.yaml")
 	close(CDIR "/rules_azi.yaml")
 	readf_ip("config/include-ips-dist.txt", BIP)
@@ -107,14 +99,14 @@ END {
 		#if (p) {
 		#	print(BIP[i]) > TDIR "/iplist_blockedbyip_noid2971_collapsed.txt"
 		#}
-		if (p && ! EIP[i]) {
+		if (p && i !~ EIP) {
 			print(BIP[i] "/32") | ("sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azi.yaml'")
 		}
 	}
 	#close(TDIR "/iplist_blockedbyip_noid2971_collapsed.txt")
 	close("sort -t. -k1,1n -k2,2n -k3,3n -k4n | sed -re 's/^/  - /' >>'" CDIR "/rules_azi.yaml'")
 	delete BIP
-	delete EIP
+	#delete EIP
 	print("payload:") > (CDIR "/rules_azs.yaml")
 	close(CDIR "/rules_azs.yaml")
 	for (i in SIP) {
@@ -150,4 +142,17 @@ function readf_ip(F, A, l)
 		}
 	}
 	close(F)
+}
+
+function readf_re(inF, re, l)
+{
+	re = ""
+	while ((getline l < inF) > 0) {
+		if (l !~ /^(#|[[:space:]]*$)/) {
+			re = re l "|"
+		}
+	}
+	close(inF)
+	gsub(/\./, "\\.", re)
+	return re
 }
