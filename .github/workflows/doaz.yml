@@ -2,9 +2,9 @@ name: Do antizapret original script
 on:
   workflow_dispatch:
 
-    jobs:
-      BuildUnsigned:
-        runs-on: ubuntu-latest
+jobs:
+  BuildUnsigned:
+    runs-on: ubuntu-latest
     steps:
       - name: Cache
         uses: actions/cache@v3
