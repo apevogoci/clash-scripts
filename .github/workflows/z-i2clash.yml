@@ -32,14 +32,14 @@ jobs:
           echo $SUCC
           sudo apt install zstd idn2
           export CDIR="$(readlink -f "./clash-conf/conf")"
-          ./clash-scripts/z-i2clash.sh
+          ./clash-scripts/z-i2clash.sh | sed -re 's/.*/COMMIT_MSG=\x27&\x27/' >> $GITHUB_ENV
       - name: Commit changes
         if: ${{ env.SUCC == 0 }}
         run: |
           cd clash-conf
           git config --local user.name "ghactions"
           git add ./conf
-          git commit -m "Updating rules" || echo "SUCC=1" >> $GITHUB_ENV
+          git commit -m "${COMMIT_MSG}" || echo "SUCC=1" >> $GITHUB_ENV
       - name: Push changes
         if: ${{ env.SUCC == 0 }}
         uses: ad-m/github-push-action@master

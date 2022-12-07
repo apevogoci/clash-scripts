@@ -47,3 +47,5 @@ zstdcat "${THLS}" |
 	grep -v -F -x -f "${TEXH}" |
 	sort -u |
 	sed -re '1ipayload:' -e 's/.*/  - \x27+.&\x27/' >"${CDIR}/rules_azd.yaml"
+
+zstdgrep -m1 '' "${TLST}"
