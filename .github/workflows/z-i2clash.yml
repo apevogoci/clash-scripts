@@ -17,6 +17,9 @@ jobs:
       SUCC: 0
     runs-on: ubuntu-latest
     steps:
+      - name: Install zstd & idn2
+        run: |
+          sudo apt install zstd idn2
       - name: Checkout clash-scripts
         uses: actions/checkout@v3
         with:
@@ -30,16 +33,16 @@ jobs:
       - name: Run zi2clash
         run: |
           echo $SUCC
-          sudo apt install zstd idn2
           export CDIR="$(readlink -f "./clash-conf/conf")"
-          ./clash-scripts/z-i2clash.sh | sed -re 's/.*/COMMIT_MSG=\x27&\x27/' >> $GITHUB_ENV
+          ./clash-scripts/z-i2clash.sh || echo "SUCC=1" >> $GITHUB_ENV
       - name: Commit changes
         if: ${{ env.SUCC == 0 }}
         run: |
+          cat "./commit_msg.txt"
           cd clash-conf
           git config --local user.name "ghactions"
           git add ./conf
-          git commit -m "${COMMIT_MSG}" || echo "SUCC=1" >> $GITHUB_ENV
+          git commit -F "../commit_msg.txt" || echo "SUCC=1" >> $GITHUB_ENV
       - name: Push changes
         if: ${{ env.SUCC == 0 }}
         uses: ad-m/github-push-action@master

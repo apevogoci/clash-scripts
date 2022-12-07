@@ -37,15 +37,18 @@ LISTSIZE="$(grep -i '^ *content-length:' "${TRSP}" | sed -re 's/[^0-9]//g')"
 #LISTSIZE="$(grep -i '^ *content-length:' "${TRSP}" | sed -re 's/[^0-9]//g')"
 #[ "${LISTSIZE}" != "$(stat -c %s "${TNXD}")" ] && echo "List 2 size differs" && exit 2
 
+echo "First step"
 zstdcat "${TLST}" |
 	iconv -f cp1251 -t utf-8 |
 	awk -f "scripts/zapret-info2clash.awk" |
 	awk -f "scripts/getzones.awk" |
 	zstd -3 >"${THLS}"
 
+echo "Second step"
 zstdcat "${THLS}" |
 	grep -v -F -x -f "${TEXH}" |
 	sort -u |
 	sed -re '1ipayload:' -e 's/.*/  - \x27+.&\x27/' >"${CDIR}/rules_azd.yaml"
 
-zstdgrep -m1 '' "${TLST}"
+echo "Write commit message"
+zstdgrep -m1 '' "${TLST}" >"../commit_msg.txt"
