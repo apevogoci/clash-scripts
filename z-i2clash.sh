@@ -40,6 +40,7 @@ fi
 
 REPO='https://raw.githubusercontent.com/zapret-info/z-i/master'
 dwnld "${REPO}/dump.csv" "$TLST"
+cat "$TRSP"
 #dwnld "${REPO}/nxdomain.txt" "$TNXD"
 
 echo "First step"
